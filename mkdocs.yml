@@ -1,0 +1,78 @@
+site_name: Sioux's Site
+site_author: Sioux
+site_description: Sioux's Private Site
+copyright: Copyright &copy; 2023 - 2024 Sioux
+repo_url: https://github.com/maxisioux/maxisioux.github.io
+repo_name: maxisioux/maxisioux.github.io
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: blue grey
+    # accent: orange
+    second: grey
+  logo: img/small-logo.png
+  icon:
+    repo: fontawesome/brands/github
+  favicon: img/small-logo.png
+  features:
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+
+extra_css:
+  - stylesheets/reference.css
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_root_toc_entry: false
+            show_if_no_docstring: true
+            group_by_category: false
+
+nav:
+- Home: index.md
+- Projects:
+    - All: projects/index.md
+    - Demo-project1:
+        - Getting started: projects/demo/getting-started.md
+        - Setup: projects/demo/setup.md
+    - Demo-project2:
+        - Getting started: projects/demo/getting-started.md
+- Notes:
+    - All: notes/index.md
+    - Python:
+        - Getting started: notes/python/start.md
+    - C++:
+        - Getting started: notes/cpp/start.md
+- About:
+    - About: about/about.md
+    - Release Notes: about/release-notes.md
+    - License: about/license.md
+
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - markdown_include.include:
+      base_path: docs
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.keys
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/maxisioux
