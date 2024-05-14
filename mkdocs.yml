@@ -8,18 +8,24 @@ repo_name: maxisioux/maxisioux.github.io
 theme:
   name: material
   palette:
-    scheme: slate
-    primary: blue grey
-    # accent: orange
-    second: grey
+    scheme: slate # 配色方案
+    primary: blue grey # 主色
+    # accent: orange # 强调色
+    second: grey # 第二配色
   logo: img/small-logo.png
   icon:
     repo: fontawesome/brands/github
   favicon: img/small-logo.png
   features:
-    - content.code.copy
-    - content.code.select
+    - content.code.copy # 代码支持拷贝
+    - content.code.select 
     - content.code.annotate
+    - navigation.tabs # 顶部导航
+    - navigation.tabs.sticky # 顶部导航粘连
+    - navigation.indexes # 导航index页面支持
+    # - navigation.sections # 全部展开(非折叠状态)
+    # - navigation.expand # 子目录展开
+    - navigation.top # 返回顶部按钮
 
 extra_css:
   - stylesheets/reference.css
@@ -46,7 +52,11 @@ nav:
 - Notes:
     - All: notes/index.md
     - Python:
-        - Getting started: notes/python/start.md
+      - Getting started: notes/python/start.md
+      - Alembic:
+        - notes/python/alembic/alembic.md
+      - Sqlalchemy:
+        - notes/python/sqlalchemy/sqlalchemy-1.x.md
     - C++:
         - Getting started: notes/cpp/start.md
 - About:
