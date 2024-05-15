@@ -5,41 +5,6 @@ copyright: Copyright &copy; 2023 - 2024 Sioux
 repo_url: https://github.com/maxisioux/maxisioux.github.io
 repo_name: maxisioux/maxisioux.github.io
 
-theme:
-  name: material
-  palette:
-    scheme: slate # 配色方案
-    primary: blue grey # 主色
-    # accent: orange # 强调色
-    second: grey # 第二配色
-  logo: img/small-logo.png
-  icon:
-    repo: fontawesome/brands/github
-  favicon: img/small-logo.png
-  features:
-    - content.code.copy # 代码支持拷贝
-    - content.code.select 
-    - content.code.annotate
-    - navigation.tabs # 顶部导航
-    - navigation.tabs.sticky # 顶部导航粘连
-    - navigation.indexes # 导航index页面支持
-    # - navigation.sections # 全部展开(非折叠状态)
-    # - navigation.expand # 子目录展开
-    - navigation.top # 返回顶部按钮
-
-extra_css:
-  - stylesheets/reference.css
-
-plugins:
-  - search
-  - mkdocstrings:
-      handlers:
-        python:
-          options:
-            show_root_toc_entry: false
-            show_if_no_docstring: true
-            group_by_category: false
-
 nav:
 - Home: index.md
 - Projects:
@@ -51,6 +16,8 @@ nav:
         - Getting started: projects/demo/getting-started.md
 - Notes:
     - All: notes/index.md
+    - Markdown:
+      - Start: notes/markdown/started.md
     - Python:
       - Getting started: notes/python/start.md
       - Alembic:
@@ -64,24 +31,137 @@ nav:
     - Release Notes: about/release-notes.md
     - License: about/license.md
 
+theme:
+  name: material
+  custom_dir: docs/templates
+  logo: assets/logo.png # 左上角主页logo
+  favicon: assets/logo.png # 标签图标
+  icon:
+    repo: fontawesome/brands/github # 右上角repologo
+  palette:
+  - media: "(prefers-color-scheme)"
+    toggle:
+      icon: material/brightness-auto
+      name: Switch to light mode
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: teal
+    accent: purple
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: black
+    accent: lime
+    toggle:
+      icon: material/weather-night
+      name: Switch to system preference
+  features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.tabs.link
+    - content.code.annotate
+    - content.code.copy
+    - content.tooltips
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - toc.follow
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+
+extra_css:
+  - 'css/custom.css'
+  - 'css/reference.css'
+  - 'css/terminal.css'
+  - 'css/tweaks.css'
+extra_javascript:
+  - 'js/feedback.js'
+  - 'js/fluff.js'
 
 markdown_extensions:
+  - tables
+  - admonition
+  - attr_list
+  - callouts:
+      strip_period: false
+  - footnotes
+  - md_in_html
+  - meta
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.html
+  - pymdownx.blocks.tab
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.magiclink
   - pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
       pygments_lang_class: true
+  - pymdownx.inlinehilite:
+      style_plain_text: python
+  - pymdownx.snippets:
+      check_paths: true
+      base_path: [!relative $config_dir]
+  - pymdownx.extra
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  - markdown_include.include:
-      base_path: docs
-  - admonition
-  - pymdownx.highlight
-  - pymdownx.keys
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - toc:
+      permalink: "¤"
 
+plugins:
+  - search
+  - markdown-exec
+  - mkdocstrings:
+      handlers:
+        python:
+          import:
+          - https://docs.python.org/3/objects.inv
+          - https://installer.readthedocs.io/en/stable/objects.inv  # demonstration purpose in the docs
+          - https://mkdocstrings.github.io/autorefs/objects.inv
+          - https://www.mkdocs.org/objects.inv
+          - https://python-markdown.github.io/objects.inv
+          paths: [.]
+          options:
+            docstring_options:
+              ignore_init_summary: true
+            docstring_section_style: list
+            filters: ["!^_"]
+            heading_level: 1
+            inherited_members: true
+            merge_init_into_class: true
+            parameter_headings: true
+            separate_signature: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_signature_annotations: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            signature_crossrefs: true
+            summary: true
+  - redirects:
+      redirect_maps:
+        # mkdocstrings
+        mkdocstrings.md: https://mkdocstrings.github.io/
+        mkdocstrings/usage.md: https://mkdocstrings.github.io/usage/
+        # pytkdocs
+        pytkdocs.md: https://mkdocstrings.github.io/pytkdocs/
 extra:
   social:
     - icon: fontawesome/brands/github
