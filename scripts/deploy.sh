@@ -2,10 +2,10 @@
 
 last_commit_id=`git rev-parse HEAD`
 
-git remote add maxisioux.github.io git@github.com:maxisioux/maxisioux.github.io &>/dev/null
+git remote add website_repo https://github.com/maxisioux/maxisioux.github.io.git &>/dev/null
 .venv/bin/mkdocs gh-deploy \
   --force --ignore-version \
-  --remote-name maxisioux.github.io \
+  --remote-name website_repo \
   --remote-branch main
 
 git reset --hard ${last_commit_id}
