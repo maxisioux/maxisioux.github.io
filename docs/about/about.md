@@ -4,7 +4,6 @@
 
 ## 1.2 Topic
 
-
 # 2 Topic
 
 ## 2.1 Topic

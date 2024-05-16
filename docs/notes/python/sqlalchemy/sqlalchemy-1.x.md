@@ -2,8 +2,6 @@
 
 原文可见: <https://jiajunhuang.com/articles/2019_10_30-sqlalchemy.md.html>
 
-[这里]: https://docs.sqlalchemy.org/en/13/orm/session_basics.html#session-faq-whentocreate
-
 SQLAlchemy是Python中常用的一个ORM，SQLAlchemy分成三部分：
 
 - ORM，就是我们用类来表示数据库schema的那部分
@@ -27,7 +25,9 @@ from sqlalchemy import (
     DateTime,
     String,
 )
-from config import config  # config模块里有自己写的配置，我们可以换成别的，注意下面用到config的地方也要一起换
+from config import (
+    config,
+)  # config模块里有自己写的配置，我们可以换成别的，注意下面用到config的地方也要一起换
 
 engine = create_engine(
     config.SQLALCHEMY_DATABASE_URI,  # SQLAlchemy 数据库连接串，格式见下面
@@ -42,9 +42,16 @@ Base = declarative_base(engine)
 
 class BaseMixin:
     """model的基类,所有model都必须继承"""
+
     id = Column(Integer, primary_key=True)
     created_at = Column(DateTime, nullable=False, default=datetime.datetime.now)
-    updated_at = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now, index=True)
+    updated_at = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.datetime.now,
+        onupdate=datetime.datetime.now,
+        index=True,
+    )
     deleted_at = Column(DateTime)  # 可以为空, 如果非空, 则为软删
 
 
@@ -71,13 +78,16 @@ class User(Base, BaseMixin):
 注意上面的几点：
 
 - **pool_recycle**: 设置主动回收连接的时长，如果不设置，那么可能会遇到数据库主动断开连接的问题，例如`MySQL`通常会为连接设置最大生命周期为八小时，如果没有通信，那么就会断开连接。因此不设置此选项可能就会遇到 `MySQL has gone away` 的报错。
+
 - **engine**: `engine` 是 `SQLAlchemy` 中位于数据库驱动之上的一个抽象概念，它适配了各种数据库驱动，提供了连接池等功能。其用法就是 如上面例子中，`engine = create_engine(<数据库连接串>)`，数据库连接串的格式是 `dialect+driver://username:password@host:port/database?参数` 这样的，**dialect** 可以是 `mysql`, `postgresql`, `oracle`, `mssql`, `sqlite`，后面的 **driver** 是驱动，比如`MySQL`的驱动`pymysql`， 如果不填写，就使用默认驱动。再往后就是`用户名`、`密码`、`地址`、`端口`、`数据库`、`连接参数`了，来看几个例子：
-  - **MySQL**: `engine = create_engine('mysql+pymysql://scott:tiger@localhost/foo?charset=utf8mb4')`
-  - **PostgreSQL**: `engine = create_engine('postgresql+psycopg2://scott:tiger@localhost/mydatabase')`
-  - **Oracle**: `engine = create_engine('oracle+cx_oracle://scott:tiger@tnsname')`
-  - **MS SQL**: `engine = create_engine('mssql+pymssql://scott:tiger@hostname:port/dbname')`
-  - **SQLite**: `engine = create_engine('sqlite:////absolute/path/to/foo.db')`
-  - 详见：<https://docs.sqlalchemy.org/en/13/core/engines.html>
+
+    - **MySQL**: `engine = create_engine('mysql+pymysql://scott:tiger@localhost/foo?charset=utf8mb4')`
+    - **PostgreSQL**: `engine = create_engine('postgresql+psycopg2://scott:tiger@localhost/mydatabase')`
+    - **Oracle**: `engine = create_engine('oracle+cx_oracle://scott:tiger@tnsname')`
+    - **MS SQL**: `engine = create_engine('mssql+pymssql://scott:tiger@hostname:port/dbname')`
+    - **SQLite**: `engine = create_engine('sqlite:////absolute/path/to/foo.db')`
+    - 详见：<https://docs.sqlalchemy.org/en/13/core/engines.html>
+
 - **Session**: `Session`的意思就是会话，也就是说，是一个逻辑组织的概念，因此，这需要靠你的业务逻辑来划分哪些操作使用同一个`Session`， 哪些操作又划分为不同的业务操作，详见 [这里]。 举个简单的例子，以web应用为例，一个请求里共用一个`Session`就是一个好的例子，一个异步任务执行过程中使用一个`Session`也是一个例子。 但是注意，不能直接使用`Session`，而是使用**Session的实例**，借助上面的代码，我们可以直接这样写：
 
     ```python
@@ -86,6 +96,7 @@ class User(Base, BaseMixin):
     ```
 
 - **Base**: `Base`是`ORM`中的一个**基类**，通过集成`Base`，我们才能方便的使用一些基本的查询，例如 `s.query(User).filter_by(User.name="nick").first()`。
+
 - **BaseMixin**: `BaseMixin`是定义的一些通用的表结构，通过`Mixin`的方式集成到类里，比如上面的定义，我们常见的表结构里，都会有 **ID**、**创建时间**、**更新时间**，**软删除标志** 等等，我们把它作为一个独立的类，这样通过继承即可获得相关表属性，省得重复写多次。
 
 ## 表的设计
@@ -228,7 +239,7 @@ class MatchType(Boolean):
 
     ```python
     with get_session() as s:
-        s.query(User).update({'name': 'nick'})
+        s.query(User).update({"name": "nick"})
     ```
 
 - `UPDATE user SET name='nick' WHERE id=1` 应该这样写：
@@ -264,16 +275,16 @@ with get_session() as s:
 
 ```python
 with get_session() as s:
-        s.query(Customer).join(Invoice).filter(Invoice.amount == 8500)
+    s.query(Customer).join(Invoice).filter(Invoice.amount == 8500)
 ```
 
 可以是这么几种写法：
 
 ```python
-query.join(Address, User.id==Address.user_id)    # explicit condition
-query.join(User.addresses)                       # specify relationship from left to right
-query.join(Address, User.addresses)              # same, with explicit target
-query.join('addresses')                          # same, using a string
+query.join(Address, User.id == Address.user_id)  # explicit condition
+query.join(User.addresses)  # specify relationship from left to right
+query.join(Address, User.addresses)  # same, with explicit target
+query.join("addresses")  # same, using a string
 ```
 
 ## 数据库migration
@@ -288,9 +299,7 @@ query.join('addresses')                          # same, using a string
 然后我们要修改 `alembic/env.py` (假设你设置的保存`migration`的文件夹名称就是 `alembic`)，将对应部分修改成如下：
 
 ```python
-config.set_main_option(
-    'sqlalchemy.url', config.SQLALCHEMY_DATABASE_URI
-)
+config.set_main_option("sqlalchemy.url", config.SQLALCHEMY_DATABASE_URI)
 target_metadata = Base.metadata  # 从任意一个我们的model可以拿到总的Base
 engine = target_metadata.bind
 ```
@@ -303,10 +312,12 @@ engine = target_metadata.bind
 
 这一篇中我们看了如何使用`SQLAlchemy`来进行常见的操作，我们首先从如何定义表开始，接着我们注意看了常见的SQL操作对应的 `SQLAlchemy`操作是怎样的，最后我们看了以下`alembic`应该怎么配置才能自动生成`migration`脚本。
 
-----
+---
 
 参考资料：
 
 - **[官方文档](https://docs.sqlalchemy.org/en/13/intro.html)**
 
-----
+---
+
+[这里]: https://docs.sqlalchemy.org/en/13/orm/session_basics.html#session-faq-whentocreate

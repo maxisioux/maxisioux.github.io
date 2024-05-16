@@ -1,19 +1,29 @@
+---
+template: post.html
+title: How to add Alembic migrations to an existing FastAPI + Ormar project
+date: 2024-05-13
+authors:
+  - Maxi Sioux
+tags: python mkdocs mkdocstrings
+hide: [toc]
+---
+
+This is a summary information, ah ah ah ah
+
+<!--more-->
+
+
 # alembic入门
 
-[sqlalchemy]: https://docs.sqlalchemy.org/en/14/ "SQLAlchemy"
-[alembic]: https://alembic.zzzcomputing.com/en/latest/index.html "Alembic"
-[alembic.ini]: https://alembic.sqlalchemy.org/en/latest/tutorial.html#editing-the-ini-file "alembic.ini"
-[target_metadata]: https://alembic.sqlalchemy.org/en/latest/ops.html?highlight=target_metadata#alembic.operations.Operations.f "target_metadata"
+官方文档: <https://alembic.sqlalchemy.org/en/latest/index.html>{target="\_blank"}
 
-官方文档: <https://alembic.sqlalchemy.org/en/latest/index.html>{target="_blank"}
+相关项目: <https://github.com/python-gino/gino>{target="\_blank"} - [文档](https://www.bookstack.cn/read/gino-1.0-zh/3d56d5fe80ab5932.md){target="\_blank"}
 
-相关项目: <https://github.com/python-gino/gino>{target="_blank"} - [文档](https://www.bookstack.cn/read/gino-1.0-zh/3d56d5fe80ab5932.md){target="_blank"}
+翻译的alembic文档: <https://hellowac.github.io/alembic_doc/>{target="\_blank"}
 
-翻译的alembic文档: <https://hellowac.github.io/alembic_doc/>{target="_blank"}
+[alembic]{target="\_blank"}是[sqlalchemy]{target="\_blank"}的作者开发的。用来做OMR模型与数据库的迁移与映射。`alembic`使用方式跟`git`有点了类似，表现在两个方面，第一个，`alembic`的所有命令都是以`alembic`开头；第二，`alembic`的迁移文件也是通过版本进行控制的。首先，通过`pip install alembic`进行安装。以下将解释`alembic`的用法：
 
-[alembic]{target="_blank"}是[sqlalchemy]{target="_blank"}的作者开发的。用来做OMR模型与数据库的迁移与映射。`alembic`使用方式跟`git`有点了类似，表现在两个方面，第一个，`alembic`的所有命令都是以`alembic`开头；第二，`alembic`的迁移文件也是通过版本进行控制的。首先，通过`pip install alembic`进行安装。以下将解释`alembic`的用法：
-
-## 初始化[alembic]{target="_blank"}仓库
+## 初始化[alembic]{target="\_blank"}仓库
 
 在终端中，`cd` 到你的项目目录中，然后执行命令`alembic init alembic`，创建一个名叫`alembic`的仓库。
 
@@ -22,46 +32,51 @@
 创建一个`models.py`模块，然后在里面定义你的模型类，示例代码如下：
 
 ```python
-from sqlalchemy import Column,Integer,String,create_engine,Text
+from sqlalchemy import Column, Integer, String, create_engine, Text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
-class User(Base):
-    __tablename__ = 'user'
 
-    id = Column(Integer,primary_key=True)
-    username = Column(String(20),nullable=False)
-    password = Column(String(100),nullable=False)
+
+class User(Base):
+    __tablename__ = "user"
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String(20), nullable=False)
+    password = Column(String(100), nullable=False)
+
 
 class Article(Base):
-    __tablename__ = 'article'
+    __tablename__ = "article"
 
-    id = Column(Integer,primary_key=True)
-    title = Column(String(100),nullable=False)
+    id = Column(Integer, primary_key=True)
+    title = Column(String(100), nullable=False)
     content = Column(Text, nullable=False)
 ```
 
 ### 设置数据库连接
 
-在[alembic.ini]{target="_blank"}中设置数据库的连接，`sqlalchemy.url = driver://user:pass@localhost/dbname`，比如以mysql数据库为例，则配置后的代码为：
+在[alembic.ini]{target="\_blank"}中设置数据库的连接，`sqlalchemy.url = driver://user:pass@localhost/dbname`，比如以mysql数据库为例，则配置后的代码为：
 
 ```python
 sqlalchemy.url = mysql+mysqldb://root:root@localhost/alembic_demo?charset=utf8
 ```
 
-### 设置[target_metadata]{target="_blank"}
+### 设置[target_metadata]{target="\_blank"}
 
-为了使用模型类更新数据库，需要在`env.py`文件中设置[target_metadata]{target="_blank"}，默认为`target_metadata=None`。使用`sys`模块把当前项目的路径导入到`path`中：
+为了使用模型类更新数据库，需要在`env.py`文件中设置[target_metadata]{target="\_blank"}，默认为`target_metadata=None`。使用`sys`模块把当前项目的路径导入到`path`中：
 
 ```python
 import os
 import sys
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
 from models import Base
-... #省略代码
-target_metadata = Base.metadata # 设置创建模型的元类
-... #省略代码
+
+...  # 省略代码
+target_metadata = Base.metadata  # 设置创建模型的元类
+...  # 省略代码
 ```
 
 ## 自动生成迁移文件
@@ -93,7 +108,12 @@ target_metadata = Base.metadata # 设置创建模型的元类
 
 ## 经典错误
 
-| 错误描述                                                     | 原因                                                         | 解决办法                                                                |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| `FAILED: Target database is not up to date.`                 | 主要是`heads`和`current`不相同。`current`落后于heads的版本。 | 将`current`移动到`head`上。`alembic upgrade head`                       |
-| `FAILED: Can't locate revision identified by '77525ee61b5b'` | 数据库中存的版本号不在迁移脚本文件中                         | 删除数据库的`alembic_version`表中的数据，重新执行`alembic upgrade head` |
+| 错误描述                                                         | 原因                                            | 解决办法                                                    |
+| ------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------- |
+| `FAILED: Target database is not up to date.`                 | 主要是`heads`和`current`不相同。`current`落后于heads的版本。 | 将`current`移动到`head`上。`alembic upgrade head`             |
+| `FAILED: Can't locate revision identified by '77525ee61b5b'` | 数据库中存的版本号不在迁移脚本文件中                            | 删除数据库的`alembic_version`表中的数据，重新执行`alembic upgrade head` |
+
+[alembic]: https://alembic.zzzcomputing.com/en/latest/index.html "Alembic"
+[alembic.ini]: https://alembic.sqlalchemy.org/en/latest/tutorial.html#editing-the-ini-file "alembic.ini"
+[sqlalchemy]: https://docs.sqlalchemy.org/en/14/ "SQLAlchemy"
+[target_metadata]: https://alembic.sqlalchemy.org/en/latest/ops.html?highlight=target_metadata#alembic.operations.Operations.f "target_metadata"

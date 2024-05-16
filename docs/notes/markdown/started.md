@@ -1,28 +1,39 @@
+---
+template: post.html
+title: How to add Alembic migrations to an existing FastAPI + Ormar project
+date: 2024-05-13
+authors:
+  - Maxi Sioux
+tags: python mkdocs mkdocstrings
+# hide: [toc]
+---
+
+This is a summary information, ah ah ah ah
+
+<!--more-->
+
 # Topic1
+
 > tip2 this is a note that xxxxxx
 
 !!! tip "Learn more"
     See the [documentation on supported types](../../about/about.md).
 
-TIP: **Changed in version 0.15.**  
+TIP: **Changed in version 0.15.**
 Linking to any Markdown heading used to be the default, but now opt-in is required.
 
-> NOTE: **Resources on YAML.**
-> YAML can sometimes be a bit tricky, particularly on indentation.
-> Here are some resources that other users found useful to better
-> understand YAML's peculiarities.
+> NOTE: **Resources on YAML.** YAML can sometimes be a bit tricky, particularly on indentation. Here are some resources that other users found useful to better understand YAML's peculiarities.
 >
 > - [YAML idiosyncrasies](https://docs.saltproject.io/en/3000/topics/troubleshooting/yaml_idiosyncrasies.html)
 > - [YAML multiline](https://yaml-multiline.info/)
 
-
 WARNING: Since *mkdocstrings* 0.19, the YAML `rendering` key is merged into the `options` key.
 
-
-
 # mkdocstrings usage
+
 ???+ example "Performance Example - Pydantic vs. dedicated code"
     _(This example requires Python 3.9+)_
+
     ```python
     from typing import Annotated, Dict, List, Literal, Tuple
 
@@ -33,26 +44,24 @@ WARNING: Since *mkdocstrings* 0.19, the YAML `rendering` key is merged into the 
 
     class Fruit(BaseModel):
         name: str  # (1)!
-        color: Literal['red', 'green']  # (2)!
+        color: Literal["red", "green"]  # (2)!
         weight: Annotated[float, Gt(0)]  # (3)!
         bazam: Dict[str, List[Tuple[int, bool, float]]]  # (4)!
 
 
     print(
         Fruit(
-            name='Apple',
-            color='red',
+            name="Apple",
+            color="red",
             weight=4.2,
-            bazam={'foobar': [(1, True, 0.1)]},
+            bazam={"foobar": [(1, True, 0.1)]},
         )
     )
-    #> name='Apple' color='red' weight=4.2 bazam={'foobar': [(1, True, 0.1)]}
+    # > name='Apple' color='red' weight=4.2 bazam={'foobar': [(1, True, 0.1)]}
     ```
 
-
 ??? example "Performance Example - Pydantic vs. dedicated code"
-    In general, dedicated code should be much faster that a general-purpose validator, but in this example
-    Pydantic is >300% faster than dedicated code when parsing JSON and validating URLs.
+    In general, dedicated code should be much faster that a general-purpose validator, but in this example Pydantic is >300% faster than dedicated code when parsing JSON and validating URLs.
 
     ```python
     import json
@@ -65,7 +74,7 @@ WARNING: Since *mkdocstrings* 0.19, the YAML `rendering` key is merged into the 
 
     reps = 7
     number = 100
-    r = requests.get('https://api.github.com/emojis')
+    r = requests.get("https://api.github.com/emojis")
     r.raise_for_status()
     emojis_json = r.content
 
@@ -76,46 +85,45 @@ WARNING: Since *mkdocstrings* 0.19, the YAML `rendering` key is merged into the 
         for key, value in data.items():
             assert isinstance(key, str)
             url = urlparse(value)
-            assert url.scheme in ('https', 'http')
+            assert url.scheme in ("https", "http")
             output[key] = url
 
 
     emojis_pure_python_times = timeit.repeat(
-        'emojis_pure_python(emojis_json)',
+        "emojis_pure_python(emojis_json)",
         globals={
-            'emojis_pure_python': emojis_pure_python,
-            'emojis_json': emojis_json,
+            "emojis_pure_python": emojis_pure_python,
+            "emojis_json": emojis_json,
         },
         repeat=reps,
         number=number,
     )
-    print(f'pure python: {min(emojis_pure_python_times) / number * 1000:0.2f}ms')
-    #> pure python: 5.32ms
+    print(f"pure python: {min(emojis_pure_python_times) / number * 1000:0.2f}ms")
+    # > pure python: 5.32ms
 
     type_adapter = TypeAdapter(dict[str, HttpUrl])
     emojis_pydantic_times = timeit.repeat(
-        'type_adapter.validate_json(emojis_json)',
+        "type_adapter.validate_json(emojis_json)",
         globals={
-            'type_adapter': type_adapter,
-            'HttpUrl': HttpUrl,
-            'emojis_json': emojis_json,
+            "type_adapter": type_adapter,
+            "HttpUrl": HttpUrl,
+            "emojis_json": emojis_json,
         },
         repeat=reps,
         number=number,
     )
-    print(f'pydantic: {min(emojis_pydantic_times) / number * 1000:0.2f}ms')
-    #> pydantic: 1.54ms
+    print(f"pydantic: {min(emojis_pydantic_times) / number * 1000:0.2f}ms")
+    # > pydantic: 1.54ms
 
     print(
-        f'Pydantic {min(emojis_pure_python_times) / min(emojis_pydantic_times):0.2f}x faster'
+        f"Pydantic {min(emojis_pure_python_times) / min(emojis_pydantic_times):0.2f}x faster"
     )
-    #> Pydantic 3.45x faster
+    # > Pydantic 3.45x faster
     ```
-
-
 
 !!! example "Example with the Python handler"
     A comments here if you need.
+
     === "docs/my_page.md"
         ```md
         # Documentation for `MyClass`
@@ -168,8 +176,6 @@ WARNING: Since *mkdocstrings* 0.19, the YAML `rendering` key is merged into the 
 
 It is also possible to integrate a mkdocstrings identifier into a Markdown header:
 
-
-
 !!! example
     ```yaml title="mkdocs.yml"
     plugins:
@@ -190,7 +196,6 @@ It is also possible to integrate a mkdocstrings identifier into a Markdown heade
         options:
           show_source: true
     ```
-
 
 === "Markdown"
     ```md
